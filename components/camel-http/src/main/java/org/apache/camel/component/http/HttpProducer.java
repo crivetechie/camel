@@ -274,39 +274,8 @@ public class HttpProducer extends DefaultProducer {
      * @throws IOException can be thrown
      */
     protected Object extractResponseBody(HttpMethod method, Exchange exchange) throws IOException, ClassNotFoundException {
-        InputStream is = method.getResponseBodyAsStream();
-        if (is == null) {
-            return null;
-        }
-
-        Header header = method.getResponseHeader(Exchange.CONTENT_ENCODING);
-        String contentEncoding = header != null ? header.getValue() : null;
-
-        if (!exchange.getProperty(Exchange.SKIP_GZIP_ENCODING, Boolean.FALSE, Boolean.class)) {
-            is = GZIPHelper.uncompressGzip(contentEncoding, is);
-        }
-
-        // Honor the character encoding
-        String contentType = null;
-        header = method.getResponseHeader("content-type");
-        if (header != null) {
-            contentType = header.getValue();
-            // find the charset and set it to the Exchange
-            HttpHelper.setCharsetFromContentType(contentType, exchange);
-        }
-        InputStream response = doExtractResponseBodyAsStream(is, exchange);
-        // if content type is a serialized java object then de-serialize it back to a Java object
-        if (contentType != null && contentType.equals(HttpConstants.CONTENT_TYPE_JAVA_SERIALIZED_OBJECT)) {
-            // only deserialize java if allowed
-            if (getEndpoint().getComponent().isAllowJavaSerializedObject() || getEndpoint().isTransferException()) {
-                return HttpHelper.deserializeJavaObjectFromStream(response);
-            } else {
-                // empty response
-                return null;
-            }
-        } else {
-            return response;
-        }
+        //we never want responseBody
+        return null;
     }
 
     private static InputStream doExtractResponseBodyAsStream(InputStream is, Exchange exchange) throws IOException {
